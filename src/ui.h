@@ -28,14 +28,14 @@ void ui_event_Button51(lv_event_t * e);
 extern lv_obj_t * ui_Button51;
 void ui_event_Button11(lv_event_t * e);
 extern lv_obj_t * ui_Button11;
-void ui_event_Button71(lv_event_t * e);
-extern lv_obj_t * ui_Button71;
 void ui_event_Button31(lv_event_t * e);
 extern lv_obj_t * ui_Button31;
 void ui_event_Button61(lv_event_t * e);
 extern lv_obj_t * ui_Button61;
 void ui_event_Button01(lv_event_t * e);
 extern lv_obj_t * ui_Button01;
+void ui_event_Button71(lv_event_t * e);
+extern lv_obj_t * ui_Button71;
 void ui_event_Button91(lv_event_t * e);
 extern lv_obj_t * ui_Button91;
 void ui_event_ButtonX(lv_event_t * e);
@@ -61,11 +61,22 @@ extern lv_obj_t * ui_Image3;
 // SCREEN: ui_Screen3
 void ui_Screen3_screen_init(void);
 extern lv_obj_t * ui_Screen3;
+void ui_event_Button2(lv_event_t * e);
+extern lv_obj_t * ui_Button2;
+void ui_event_Button13(lv_event_t * e);
+extern lv_obj_t * ui_Button13;
+extern lv_obj_t * ui_Image2;
+extern lv_obj_t * ui_TextArea1;
+extern lv_obj_t * ui_TextArea2;
+extern lv_obj_t * ui_TextArea3;
+extern lv_obj_t * ui_Keyboard1;
+void ta_event_cb(lv_event_t *e);
 extern lv_obj_t * ui____initial_actions0;
 
 
 LV_IMG_DECLARE(ui_img_pic1_png);    // assets/pic1.png
 LV_IMG_DECLARE(ui_img_pic2_png);    // assets/pic2.png
+LV_IMG_DECLARE(ui_img_pic3_png);    // assets/pic3.png
 
 
 

@@ -221,33 +221,33 @@ EEPROM.begin(EEPROM_SIZE); // Khởi tạo EEPROM
 
   
 }
-void ui_event_Button8(lv_event_t * e) {
-//     lv_event_code_t event_code = lv_event_get_code(e);
-//     lv_obj_t * target = lv_event_get_target(e);
+void ui_event_Button13(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
     
-//     if(event_code == LV_EVENT_RELEASED) {
-//         //const char* input_text = lv_textarea_get_text(ui_Text3);
-//       //  int text_length = strlen(input_text);
+    if(event_code == LV_EVENT_RELEASED) {
+        const char* input_text = lv_textarea_get_text(ui_TextArea1);
+       int text_length = strlen(input_text);
         
-//         // Lưu độ dài của text vào EEPROM
-//         EEPROM.write(TEXT_ADDRESS, text_length);
+        // Lưu độ dài của text vào EEPROM
+        EEPROM.write(TEXT_ADDRESS, text_length);
         
-//         // Lưu text vào EEPROM
-//         for(int i = 0; i < text_length; i++) {
-//             EEPROM.write(TEXT_ADDRESS + 1 + i, input_text[i]);
-//         }
+        // Lưu text vào EEPROM
+        for(int i = 0; i < text_length; i++) {
+            EEPROM.write(TEXT_ADDRESS + 1 + i, input_text[i]);
+        }
         
-//         EEPROM.commit(); // Cần thiết cho ESP32/ESP8266
+        EEPROM.commit(); // Cần thiết cho ESP32/ESP8266
         
-//         // In ra Serial để debug
-//         Serial.println("Saved text to EEPROM:");
-//         Serial.println(input_text);
+        // In ra Serial để debug
+        Serial.println("Saved text to EEPROM:");
+        Serial.println(input_text);
         
-//         // Chuyển màn hình (nếu cần)
-//        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Screen2_screen_init);
-//     }
-// }
+        // Chuyển màn hình (nếu cần)
+       _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Screen2_screen_init);
+    }
 }
+
 
 
 void readFromEEPROM() {
@@ -445,24 +445,24 @@ void connect_to_wifi(const char *ssid, const char *password)
 }
 void ui_event_SaveWiFi(lv_event_t *e)
 {
-//   lv_event_code_t event_code = lv_event_get_code(e);
-//   lv_obj_t *target = lv_event_get_target(e);
-//   if (event_code == LV_EVENT_RELEASED)
-//   {
-//    // const char *wifi_ssid = lv_textarea_get_text(ui_TextArea3);
-//    // const char *wifi_pwd = lv_textarea_get_text(ui_TextArea2);
-//  if (wifi_ssid && wifi_pwd && strlen(wifi_ssid) > 0)
-//         {
-//             LV_LOG_USER("Bắt đầu kết nối WiFi...");
-//             connect_to_wifi(wifi_ssid, wifi_pwd);
-//             Serial.println("wifi connected! ");
-//         }
-//         else
-//         {
-//           Serial.println("Error pwd ");
-//             //lv_label_set_text(ui_Label_Status, "SSID hoặc Password không hợp lệ!");
-//         }
-//   }
+  lv_event_code_t event_code = lv_event_get_code(e);
+  lv_obj_t *target = lv_event_get_target(e);
+  if (event_code == LV_EVENT_RELEASED)
+  {
+   const char *wifi_ssid = lv_textarea_get_text(ui_TextArea3);
+   const char *wifi_pwd = lv_textarea_get_text(ui_TextArea2);
+ if (wifi_ssid && wifi_pwd && strlen(wifi_ssid) > 0)
+        {
+            LV_LOG_USER("Bắt đầu kết nối WiFi...");
+            connect_to_wifi(wifi_ssid, wifi_pwd);
+            Serial.println("wifi connected! ");
+        }
+        else
+        {
+          Serial.println("Error pwd ");
+            //lv_label_set_text(ui_Label_Status, "SSID hoặc Password không hợp lệ!");
+        }
+  }
 
 }
 
