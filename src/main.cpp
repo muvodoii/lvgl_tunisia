@@ -1,10 +1,10 @@
 #include<Arduino.h>
 #include <lvgl.h>
 #include <LovyanGFX.hpp>
-#include <Adafruit_Sensor.h>
+// #include <Adafruit_Sensor.h>
 #include "FT6236.h"
 #include "ui.h"
-#include "DHT.h"
+// #include "DHT.h"
 
 #include <EEPROM.h>
 #include <WiFi.h>
@@ -17,9 +17,10 @@ const int i2c_touch_addr = TOUCH_I2C_ADD;
 
 #define DHTPIN 40     // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-
+static char current_password[10] = "";
+static uint8_t password_len = 0;
 // Initialize DHT20 sensor
-DHT dht(DHTPIN, DHTTYPE);
+
 #define SDA_FT6236 38
 #define SCL_FT6236 39
 //FT6236 ts = FT6236();
@@ -135,7 +136,13 @@ void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
     data->state = LV_INDEV_STATE_REL;
   }
 }
-
+void add_number_to_password(char num) {
+    if(password_len < 9) {
+        current_password[password_len++] = num;
+        current_password[password_len] = '\0';
+        lv_textarea_set_text(ui_TextAreaS1, current_password);
+    }
+}
 
 void touch_init()
 {
@@ -158,18 +165,7 @@ void touch_init()
     Serial.println(i2c_touch_addr, HEX);
   }
 }
-void event_handler_login(lv_event_t *e) {
-   const char *input_password = lv_textarea_get_text(password_txt_area);
 
-    if (strcmp(input_password, correct_password) == 0) {
-        // Nếu đúng -> Chuyển sang screen2
-        lv_scr_load(ui_Screen2);
-    } else {
-        // Nếu sai -> Hiển thị lỗi
-        Serial.println("Error password!");
-       // lv_label_set_text(error_label, "Sai mật khẩu! Thử lại.");
-    }
-}
 void setupUDP() {
     udp.begin(UDP_PORT);
     Serial.println("UDP initialized");
@@ -226,31 +222,34 @@ EEPROM.begin(EEPROM_SIZE); // Khởi tạo EEPROM
   
 }
 void ui_event_Button8(lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+//     lv_event_code_t event_code = lv_event_get_code(e);
+//     lv_obj_t * target = lv_event_get_target(e);
     
-    if(event_code == LV_EVENT_RELEASED) {
-        const char* input_text = lv_textarea_get_text(ui_Text3);
-        int text_length = strlen(input_text);
+//     if(event_code == LV_EVENT_RELEASED) {
+//         //const char* input_text = lv_textarea_get_text(ui_Text3);
+//       //  int text_length = strlen(input_text);
         
-        // Lưu độ dài của text vào EEPROM
-        EEPROM.write(TEXT_ADDRESS, text_length);
+//         // Lưu độ dài của text vào EEPROM
+//         EEPROM.write(TEXT_ADDRESS, text_length);
         
-        // Lưu text vào EEPROM
-        for(int i = 0; i < text_length; i++) {
-            EEPROM.write(TEXT_ADDRESS + 1 + i, input_text[i]);
-        }
+//         // Lưu text vào EEPROM
+//         for(int i = 0; i < text_length; i++) {
+//             EEPROM.write(TEXT_ADDRESS + 1 + i, input_text[i]);
+//         }
         
-        EEPROM.commit(); // Cần thiết cho ESP32/ESP8266
+//         EEPROM.commit(); // Cần thiết cho ESP32/ESP8266
         
-        // In ra Serial để debug
-        Serial.println("Saved text to EEPROM:");
-        Serial.println(input_text);
+//         // In ra Serial để debug
+//         Serial.println("Saved text to EEPROM:");
+//         Serial.println(input_text);
         
-        // Chuyển màn hình (nếu cần)
-       _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Screen2_screen_init);
-    }
+//         // Chuyển màn hình (nếu cần)
+//        _ui_screen_change(&ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Screen2_screen_init);
+//     }
+// }
 }
+
+
 void readFromEEPROM() {
     int saved_length = EEPROM.read(TEXT_ADDRESS);
     
@@ -262,7 +261,7 @@ void readFromEEPROM() {
         }
         saved_text[saved_length] = '\0';
         
-        lv_textarea_set_text(ui_Text3, saved_text);
+     //   lv_textarea_set_text(ui_Text3, saved_text);
         Serial.println("Read from EEPROM:");
         Serial.println(saved_text);
     } else {
@@ -272,8 +271,7 @@ void readFromEEPROM() {
 void loop()
 {
   char DHT_buffer[6];
-  int a = (int)dht.readTemperature();
-  int b = (int)dht.readHumidity();
+  
   
   
   if(led == 1)
@@ -285,7 +283,7 @@ void loop()
   delay( 5 );
 }
 
-void ui_event_Button3(lv_event_t * e) {
+void ui_event_Button12(lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     
@@ -303,7 +301,7 @@ void ui_event_Button3(lv_event_t * e) {
             saved_text[saved_length] = '\0';
             
             // Hiển thị text lên textarea
-            lv_textarea_set_text(ui_Text3, saved_text);
+         //   lv_textarea_set_text(ui_Text3, saved_text);
             
             // Gửi dữ liệu qua UDP
             udp.beginPacket(UDP_ADDRESS, UDP_PORT);
@@ -318,7 +316,7 @@ void ui_event_Button3(lv_event_t * e) {
         }
     }
 }
-void ui_event_Button4(lv_event_t * e)
+void ui_event_Button22(lv_event_t * e)
 {
   lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -337,7 +335,7 @@ void ui_event_Button4(lv_event_t * e)
             saved_text[saved_length] = '\0';
             
             // Hiển thị text lên textarea
-            lv_textarea_set_text(ui_Text3, saved_text);
+    //        lv_textarea_set_text(ui_Text3, saved_text);
             
             // Gửi dữ liệu qua UDP
             udp.beginPacket(UDP_ADDRESS, UDP_PORT);
@@ -352,7 +350,7 @@ void ui_event_Button4(lv_event_t * e)
         }
     }
 }
-void ui_event_Button5(lv_event_t * e)
+void ui_event_Button32(lv_event_t * e)
 {
  lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -371,7 +369,7 @@ void ui_event_Button5(lv_event_t * e)
             saved_text[saved_length] = '\0';
             
             // Hiển thị text lên textarea
-            lv_textarea_set_text(ui_Text3, saved_text);
+          //  lv_textarea_set_text(ui_Text3, saved_text);
             
             // Gửi dữ liệu qua UDP
             udp.beginPacket(UDP_ADDRESS, UDP_PORT);
@@ -386,7 +384,7 @@ void ui_event_Button5(lv_event_t * e)
         }
     }
 }
-void ui_event_Button6(lv_event_t * e)
+void ui_event_Button42(lv_event_t * e)
 {
   lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -405,7 +403,7 @@ void ui_event_Button6(lv_event_t * e)
             saved_text[saved_length] = '\0';
             
             // Hiển thị text lên textarea
-            lv_textarea_set_text(ui_Text3, saved_text);
+     //       lv_textarea_set_text(ui_Text3, saved_text);
             
             // Gửi dữ liệu qua UDP
             udp.beginPacket(UDP_ADDRESS, UDP_PORT);
@@ -447,24 +445,135 @@ void connect_to_wifi(const char *ssid, const char *password)
 }
 void ui_event_SaveWiFi(lv_event_t *e)
 {
-  lv_event_code_t event_code = lv_event_get_code(e);
-  lv_obj_t *target = lv_event_get_target(e);
-  if (event_code == LV_EVENT_RELEASED)
-  {
-    const char *wifi_ssid = lv_textarea_get_text(ui_TextArea3);
-    const char *wifi_pwd = lv_textarea_get_text(ui_TextArea2);
- if (wifi_ssid && wifi_pwd && strlen(wifi_ssid) > 0)
-        {
-            LV_LOG_USER("Bắt đầu kết nối WiFi...");
-            connect_to_wifi(wifi_ssid, wifi_pwd);
-            Serial.println("wifi connected! ");
-        }
-        else
-        {
-          Serial.println("Error pwd ");
-            //lv_label_set_text(ui_Label_Status, "SSID hoặc Password không hợp lệ!");
-        }
-  }
+//   lv_event_code_t event_code = lv_event_get_code(e);
+//   lv_obj_t *target = lv_event_get_target(e);
+//   if (event_code == LV_EVENT_RELEASED)
+//   {
+//    // const char *wifi_ssid = lv_textarea_get_text(ui_TextArea3);
+//    // const char *wifi_pwd = lv_textarea_get_text(ui_TextArea2);
+//  if (wifi_ssid && wifi_pwd && strlen(wifi_ssid) > 0)
+//         {
+//             LV_LOG_USER("Bắt đầu kết nối WiFi...");
+//             connect_to_wifi(wifi_ssid, wifi_pwd);
+//             Serial.println("wifi connected! ");
+//         }
+//         else
+//         {
+//           Serial.println("Error pwd ");
+//             //lv_label_set_text(ui_Label_Status, "SSID hoặc Password không hợp lệ!");
+//         }
+//   }
 
 }
 
+void ui_event_Button01(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('0');
+    }
+}
+
+void ui_event_Button11(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('1');
+    }
+}
+
+void ui_event_Button21(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('2');
+    }
+}
+
+void ui_event_Button31(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('3');
+    }
+}
+
+void ui_event_Button41(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('4');
+    }
+}
+
+void ui_event_Button51(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('5');
+    }
+}
+
+void ui_event_Button61(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('6');
+    }
+}
+
+void ui_event_Button71(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('7');
+    }
+}
+
+void ui_event_Button81(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('8');
+    }
+}
+
+void ui_event_Button91(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        add_number_to_password('9');
+    }
+}
+
+void ui_event_ButtonX(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        if(password_len > 0) {
+            current_password[--password_len] = '\0';
+            lv_textarea_set_text(ui_TextAreaS1, current_password);
+        }
+    }
+}
+
+void ui_event_ButtonCF(lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_RELEASED) {
+        if(strcmp(current_password, "1234") == 0) {
+            // Chuyển sang screen2
+            lv_scr_load_anim(ui_Screen2, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, false);
+            
+            // Reset password
+            password_len = 0;
+            current_password[0] = '\0';
+            lv_textarea_set_text(ui_TextAreaS1, "");
+        } else {
+            // Hiển thị thông báo sai mật khẩu (tùy chọn)
+            lv_textarea_set_text(ui_TextAreaS1, "Wrong password!");
+            password_len = 0;
+            current_password[0] = '\0';
+        }
+    }
+}
